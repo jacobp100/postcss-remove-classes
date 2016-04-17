@@ -1,9 +1,9 @@
-# post-css-remove-classes
+# postcss-remove-classes
 
 Removes all instances of one or more class selectors from a CSS file.
 
 ```bash
-npm i --save-dev post-css-remove-classes
+npm i --save-dev postcss-remove-classes
 ```
 
 ```js
