@@ -1,7 +1,7 @@
 {
   "name": "postcss-remove-classes",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "PostCSS plugin to remove specific classes from a CSS file",
   "main": "index.js",
   "jsnext:main": "src/index.js",
   "scripts": {
@@ -9,7 +9,14 @@
     "test:watch": "ava --watch",
     "build": "babel src/index.js -o index.js"
   },
-  "keywords": [],
+  "keywords": [
+    "postcss",
+    "css",
+    "minify",
+    "min",
+    "class",
+    "className"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
