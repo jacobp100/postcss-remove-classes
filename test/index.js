@@ -55,3 +55,8 @@ test('it should handle :not', t => {
   t.is(removeClasses(['a', 'b'], 'p:not(.a, .b)'), 'p');
   t.is(removeClasses(['a', 'b'], 'p:not(.a, .b, .c)'), 'p:not( .c)');
 });
+
+test('compound selectors', t => {
+  t.is(removeClasses(['a'], '.a, .b'), '.b');
+  t.is(removeClasses(['a'], '.b, .a'), '.b');
+});
