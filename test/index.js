@@ -6,6 +6,10 @@ test('postcss api', t => {
   t.is(postcss().use(plugin(['a'])).process('.a {} .b {}').css, '.b {}');
 });
 
+test('should only remove a single element in a compound class', t => {
+  t.is(postcss().use(plugin(['a'])).process('.a, .b {}').css, '.b {}');
+});
+
 test('it should remove a single class name', t => {
   t.is(removeClasses(['a'], '.a'), '');
   t.is(removeClasses(['a'], '.a.b'), '');

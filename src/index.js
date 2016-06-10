@@ -1,6 +1,8 @@
 /* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
 
-import { castArray, some, includes, reject, matches, overEvery } from 'lodash/fp';
+import {
+  map, compact, castArray, some, includes, reject, matches, overEvery, partial, flow,
+} from 'lodash/fp';
 import postcss from 'postcss';
 import parser from 'postcss-selector-parser';
 
@@ -55,12 +57,17 @@ export const removeClasses = (classes, selector) => {
 };
 
 export default postcss.plugin('remove-classes', classes => root => {
+  const removeClassForSelector = partial(removeClasses, [castArray(classes)]);
   root.walkRules(rule => {
-    const newSelector = removeClasses(castArray(classes), rule.selector);
-    if (!newSelector) {
+    const newSelectors = flow(
+      map(removeClassForSelector),
+      compact
+    )(rule.selectors);
+
+    if (!newSelectors.length) {
       rule.remove();
-    } else if (newSelector !== rule.selector) {
-      rule.selector = newSelector;
+    } else if (newSelectors !== rule.selector) {
+      rule.selectors = newSelectors;
     }
   });
 });
