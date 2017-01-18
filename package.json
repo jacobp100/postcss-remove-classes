@@ -1,13 +1,14 @@
 {
   "name": "postcss-remove-classes",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "PostCSS plugin to remove specific classes from a CSS file",
   "main": "index.js",
   "jsnext:main": "src/index.js",
   "scripts": {
     "test": "ava",
     "test:watch": "ava --watch",
-    "build": "babel src/index.js -o index.js"
+    "build": "babel src/index.js -o index.js",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "postcss",

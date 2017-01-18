@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.removeClasses = undefined;
+exports.removeClasses = exports.classNameMatches = undefined;
 
 var _fp = require('lodash/fp');
 
@@ -17,16 +17,25 @@ var _postcssSelectorParser2 = _interopRequireDefault(_postcssSelectorParser);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var classNameMatches = exports.classNameMatches = (0, _fp.curry)(function (matchArg, className) {
+  if (Array.isArray(matchArg)) {
+    return (0, _fp.includes)(className, matchArg);
+  } else if (matchArg instanceof RegExp) {
+    return matchArg.test(className);
+  }
+  return matchArg === className;
+}); /* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
+
 var nodesAreEmpty = function nodesAreEmpty(node) {
   return node.nodes.length === 0;
-}; /* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
+};
 
-var removeClasses = exports.removeClasses = function removeClasses(classes, selector) {
+var removeClasses = exports.removeClasses = function removeClasses(matchesClassName, selector) {
   var parseNode = function parseNode(node) {
     switch (node.type) {
       case 'root':
         node.nodes = (0, _fp.reject)(parseNode, node.nodes);
-        return null;
+        return false;
       case 'selector':
         var didRemoveNodes = (0, _fp.some)(parseNode, node.nodes);
         if (didRemoveNodes) {
@@ -34,7 +43,7 @@ var removeClasses = exports.removeClasses = function removeClasses(classes, sele
         }
         return didRemoveNodes;
       case 'class':
-        var shouldRemoveNode = (0, _fp.includes)(node.value, classes);
+        var shouldRemoveNode = matchesClassName(node.value);
         return shouldRemoveNode;
       case 'pseudo':
         node.nodes = (0, _fp.reject)(parseNode, node.nodes);
@@ -65,10 +74,10 @@ var removeClasses = exports.removeClasses = function removeClasses(classes, sele
   return (0, _fp.trim)(String(ast));
 };
 
-exports.default = _postcss2.default.plugin('remove-classes', function (classes) {
+exports.default = _postcss2.default.plugin('remove-classes', function (matchArg) {
   return function (root) {
     root.walkRules(function (rule) {
-      var newSelector = removeClasses((0, _fp.castArray)(classes), rule.selector);
+      var newSelector = removeClasses(classNameMatches(matchArg), rule.selector);
       if (!newSelector) {
         rule.remove();
       } else if (newSelector !== rule.selector) {
