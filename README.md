@@ -1,6 +1,6 @@
 # postcss-remove-classes
 
-Removes all instances of one or more class selectors from a CSS file.
+Removes all instances of one or more class selectors from a CSS file. Accepts one argument that specifies which class names must be removed. This must be a single string, an array of strings, or a RegExp instance.
 
 ```bash
 npm i --save-dev postcss-remove-classes

@@ -1,17 +1,26 @@
 /* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
 
-import { castArray, some, includes, reject, trim } from 'lodash/fp';
+import { curry, some, includes, reject, trim } from 'lodash/fp';
 import postcss from 'postcss';
 import parser from 'postcss-selector-parser';
 
+export const classNameMatches = curry((matchArg, className) => {
+  if (Array.isArray(matchArg)) {
+    return includes(className, matchArg);
+  } else if (matchArg instanceof RegExp) {
+    return matchArg.test(className);
+  }
+  return matchArg === className;
+});
+
 const nodesAreEmpty = node => node.nodes.length === 0;
 
-export const removeClasses = (classes, selector) => {
-  const parseNode = node => {
+export const removeClasses = (matchesClassName, selector) => {
+  const parseNode = (node) => {
     switch (node.type) {
       case 'root':
         node.nodes = reject(parseNode, node.nodes);
-        return null;
+        return false;
       case 'selector':
         const didRemoveNodes = some(parseNode, node.nodes);
         if (didRemoveNodes) {
@@ -19,7 +28,7 @@ export const removeClasses = (classes, selector) => {
         }
         return didRemoveNodes;
       case 'class':
-        const shouldRemoveNode = includes(node.value, classes);
+        const shouldRemoveNode = matchesClassName(node.value);
         return shouldRemoveNode;
       case 'pseudo':
         node.nodes = reject(parseNode, node.nodes);
@@ -50,9 +59,9 @@ export const removeClasses = (classes, selector) => {
   return trim(String(ast));
 };
 
-export default postcss.plugin('remove-classes', classes => root => {
-  root.walkRules(rule => {
-    const newSelector = removeClasses(castArray(classes), rule.selector);
+export default postcss.plugin('remove-classes', matchArg => (root) => {
+  root.walkRules((rule) => {
+    const newSelector = removeClasses(classNameMatches(matchArg), rule.selector);
     if (!newSelector) {
       rule.remove();
     } else if (newSelector !== rule.selector) {
