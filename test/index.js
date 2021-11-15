@@ -63,6 +63,7 @@ test('it should handle :has', (t) => {
 test('it should handle :not', (t) => {
   t.is(removeClasses(classNameMatches('a'), 'p:not(.a)'), 'p');
   t.is(removeClasses(classNameMatches('a'), 'p:not(p.a)'), 'p');
+  t.is(removeClasses(classNameMatches('a'), 'p:not(.a) .b'), 'p .b');
   t.is(removeClasses(classNameMatches(['a', 'b']), 'p:not(.a, .b)'), 'p');
   t.is(removeClasses(classNameMatches(['a', 'b']), 'p:not(.a, .b, .c)'), 'p:not( .c)');
 });
