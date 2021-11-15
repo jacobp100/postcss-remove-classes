@@ -1,6 +1,6 @@
 {
   "name": "postcss-remove-classes",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "PostCSS plugin to remove specific classes from a CSS file",
   "main": "index.js",
   "typings": "remove-classes.d.ts",
