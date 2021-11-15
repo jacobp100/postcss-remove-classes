@@ -1,7 +1,6 @@
 /* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
 
-import { curry, some, includes, reject, trim } from 'lodash/fp';
-import postcss from 'postcss';
+import { curry, includes, reject, trim } from 'lodash/fp';
 import parser from 'postcss-selector-parser';
 
 export const classNameMatches = curry((matchArg, className) => {
@@ -22,7 +21,7 @@ export const removeClasses = (matchesClassName, selector) => {
         node.nodes = reject(parseNode, node.nodes);
         return false;
       case 'selector':
-        const didRemoveNodes = some(parseNode, node.nodes);
+        const didRemoveNodes = node.nodes.some(parseNode);
         if (didRemoveNodes) {
           node.empty();
         }
@@ -54,18 +53,25 @@ export const removeClasses = (matchesClassName, selector) => {
     }
   };
 
-  const ast = parser(parseNode).process(selector).result;
+  const ast = parser(parseNode).processSync(selector);
 
   return trim(String(ast));
 };
 
-export default postcss.plugin('remove-classes', matchArg => (root) => {
-  root.walkRules((rule) => {
-    const newSelector = removeClasses(classNameMatches(matchArg), rule.selector);
-    if (!newSelector) {
-      rule.remove();
-    } else if (newSelector !== rule.selector) {
-      rule.selector = newSelector;
-    }
-  });
+export default matchArg => ({
+  postcssPlugin: 'remove-classes',
+  prepare() {
+    const matches = classNameMatches(matchArg);
+
+    return {
+      Rule(rule) {
+        const newSelector = removeClasses(matches, rule.selector);
+        if (!newSelector) {
+          rule.remove();
+        } else if (newSelector !== rule.selector) {
+          rule.selector = newSelector;
+        }
+      },
+    };
+  },
 });

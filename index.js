@@ -7,15 +7,13 @@ exports.removeClasses = exports.classNameMatches = undefined;
 
 var _fp = require('lodash/fp');
 
-var _postcss = require('postcss');
-
-var _postcss2 = _interopRequireDefault(_postcss);
-
 var _postcssSelectorParser = require('postcss-selector-parser');
 
 var _postcssSelectorParser2 = _interopRequireDefault(_postcssSelectorParser);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
 
 var classNameMatches = exports.classNameMatches = (0, _fp.curry)(function (matchArg, className) {
   if (Array.isArray(matchArg)) {
@@ -24,7 +22,7 @@ var classNameMatches = exports.classNameMatches = (0, _fp.curry)(function (match
     return matchArg.test(className);
   }
   return matchArg === className;
-}); /* eslint no-use-before-define: [0], no-case-declarations: [0], no-param-reassign: [0] */
+});
 
 var nodesAreEmpty = function nodesAreEmpty(node) {
   return node.nodes.length === 0;
@@ -37,7 +35,7 @@ var removeClasses = exports.removeClasses = function removeClasses(matchesClassN
         node.nodes = (0, _fp.reject)(parseNode, node.nodes);
         return false;
       case 'selector':
-        var didRemoveNodes = (0, _fp.some)(parseNode, node.nodes);
+        var didRemoveNodes = node.nodes.some(parseNode);
         if (didRemoveNodes) {
           node.empty();
         }
@@ -69,20 +67,27 @@ var removeClasses = exports.removeClasses = function removeClasses(matchesClassN
     }
   };
 
-  var ast = (0, _postcssSelectorParser2.default)(parseNode).process(selector).result;
+  var ast = (0, _postcssSelectorParser2.default)(parseNode).processSync(selector);
 
   return (0, _fp.trim)(String(ast));
 };
 
-exports.default = _postcss2.default.plugin('remove-classes', function (matchArg) {
-  return function (root) {
-    root.walkRules(function (rule) {
-      var newSelector = removeClasses(classNameMatches(matchArg), rule.selector);
-      if (!newSelector) {
-        rule.remove();
-      } else if (newSelector !== rule.selector) {
-        rule.selector = newSelector;
-      }
-    });
+exports.default = function (matchArg) {
+  return {
+    postcssPlugin: 'remove-classes',
+    prepare: function prepare() {
+      var matches = classNameMatches(matchArg);
+
+      return {
+        Rule: function Rule(rule) {
+          var newSelector = removeClasses(matches, rule.selector);
+          if (!newSelector) {
+            rule.remove();
+          } else if (newSelector !== rule.selector) {
+            rule.selector = newSelector;
+          }
+        }
+      };
+    }
   };
-});
+};
