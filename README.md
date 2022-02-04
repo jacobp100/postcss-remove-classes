@@ -18,5 +18,6 @@ a:matches(.remove) /* empty */
 a:matches(.remove, .keep) /* a:matches(.keep) */
 a:not(.remove) /* a */
 a:not(.remove, .keep) /* a:not(.keep) */
+:global(.remove) .keep /* empty --- css modules support */
 a[class="remove"] /* a[class="remove"] --- Will not look in attributes */
 ```
