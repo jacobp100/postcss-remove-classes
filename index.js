@@ -47,7 +47,7 @@ var removeClasses = exports.removeClasses = function removeClasses(matchesClassN
         node.nodes = (0, _fp.reject)(parseNode, node.nodes);
 
         var argumentsIsEmpty = nodesAreEmpty(node);
-        if (node.value === ':matches' || node.value === ':has') {
+        if (node.value === ':matches' || node.value === ':has' || node.value === ':global') {
           return argumentsIsEmpty;
         } else if (node.value === ':not' && argumentsIsEmpty) {
           node.remove();

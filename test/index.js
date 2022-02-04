@@ -68,6 +68,13 @@ test('it should handle :not', (t) => {
   t.is(removeClasses(classNameMatches(['a', 'b']), 'p:not(.a, .b, .c)'), 'p:not( .c)');
 });
 
+test('it should handle :global', (t) => {
+  t.is(removeClasses(classNameMatches('a'), ':global(.a) .b'), '');
+  t.is(removeClasses(classNameMatches('a'), ':global(.a .b)'), '');
+  t.is(removeClasses(classNameMatches('a'), '.a :global(.b)'), '');
+  t.is(removeClasses(classNameMatches('a'), ':global(.c) .b'), ':global(.c) .b');
+});
+
 test('compound selectors', (t) => {
   t.is(removeClasses(classNameMatches('a'), '.a, .b'), '.b');
   t.is(removeClasses(classNameMatches('a'), '.b, .a'), '.b');

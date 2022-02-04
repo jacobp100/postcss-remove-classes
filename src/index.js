@@ -33,7 +33,7 @@ export const removeClasses = (matchesClassName, selector) => {
         node.nodes = reject(parseNode, node.nodes);
 
         const argumentsIsEmpty = nodesAreEmpty(node);
-        if (node.value === ':matches' || node.value === ':has') {
+        if (node.value === ':matches' || node.value === ':has' || node.value === ':global') {
           return argumentsIsEmpty;
         } else if (node.value === ':not' && argumentsIsEmpty) {
           node.remove();
